@@ -1,0 +1,18 @@
+[project]
+name = "reddit-partial-monitoring"
+version = "0.1.0"
+description = "Deep partial monitoring experiments for Reddit moderation with optional conversation context."
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scikit-learn>=1.4",
+    "torch>=2.2",
+    "tqdm>=4.66",
+    "transformers>=4.45",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

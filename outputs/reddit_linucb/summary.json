@@ -1,0 +1,64 @@
+{
+  "config": {
+    "data_dir": "/home/theophileberteloot/Bureau/Recherche/PhD/RedditToxicityDataset/data/conversations/",
+    "output_dir": "outputs/reddit_linucb",
+    "text_column": null,
+    "label_column": null,
+    "context_window": 6,
+    "algorithm": "linucb",
+    "bert_model": "bert-base-uncased",
+    "max_length": 256,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "human_cost": 0.2,
+    "alpha": 1.0,
+    "neural_hidden_dim": 128,
+    "neural_dropout": 0.1,
+    "neural_epochs": 10,
+    "mc_samples": 20,
+    "seed": 13,
+    "device": "auto"
+  },
+  "dataset": {
+    "examples": 3672,
+    "train": 2495,
+    "val": 515,
+    "test": 662
+  },
+  "systems": {
+    "message": {
+      "training": {
+        "train_examples": 3010.0
+      },
+      "test": {
+        "n": 662,
+        "coverage": 1.0,
+        "human_review_rate": 0.0,
+        "acted_accuracy": 0.9818731117824774,
+        "average_cost": 0.01812688821752266,
+        "cumulative_cost": 12.0,
+        "precision_remove": 0.0,
+        "recall_remove": 0.0,
+        "f1_remove": 0.0,
+        "step": 662
+      }
+    },
+    "context": {
+      "training": {
+        "train_examples": 3010.0
+      },
+      "test": {
+        "n": 662,
+        "coverage": 1.0,
+        "human_review_rate": 0.0,
+        "acted_accuracy": 0.9818731117824774,
+        "average_cost": 0.01812688821752266,
+        "cumulative_cost": 12.0,
+        "precision_remove": 0.0,
+        "recall_remove": 0.0,
+        "f1_remove": 0.0,
+        "step": 662
+      }
+    }
+  }
+}

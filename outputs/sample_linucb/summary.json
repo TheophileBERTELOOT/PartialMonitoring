@@ -1,0 +1,64 @@
+{
+  "config": {
+    "data_dir": "data/sample",
+    "output_dir": "outputs/sample_linucb",
+    "text_column": null,
+    "label_column": null,
+    "context_window": 6,
+    "algorithm": "linucb",
+    "bert_model": "hf-internal-testing/tiny-random-bert",
+    "max_length": 64,
+    "batch_size": 4,
+    "learning_rate": 0.001,
+    "human_cost": 0.2,
+    "alpha": 1.0,
+    "neural_hidden_dim": 128,
+    "neural_dropout": 0.1,
+    "neural_epochs": 10,
+    "mc_samples": 20,
+    "seed": 13,
+    "device": "cpu"
+  },
+  "dataset": {
+    "examples": 16,
+    "train": 8,
+    "val": 4,
+    "test": 8
+  },
+  "systems": {
+    "message": {
+      "training": {
+        "train_examples": 12.0
+      },
+      "test": {
+        "n": 8,
+        "coverage": 0.0,
+        "human_review_rate": 1.0,
+        "acted_accuracy": 0.0,
+        "average_cost": 0.19999999999999998,
+        "cumulative_cost": 1.5999999999999999,
+        "precision_remove": 0.0,
+        "recall_remove": 0.0,
+        "f1_remove": 0.0,
+        "step": 8
+      }
+    },
+    "context": {
+      "training": {
+        "train_examples": 12.0
+      },
+      "test": {
+        "n": 8,
+        "coverage": 0.0,
+        "human_review_rate": 1.0,
+        "acted_accuracy": 0.0,
+        "average_cost": 0.19999999999999998,
+        "cumulative_cost": 1.5999999999999999,
+        "precision_remove": 0.0,
+        "recall_remove": 0.0,
+        "f1_remove": 0.0,
+        "step": 8
+      }
+    }
+  }
+}

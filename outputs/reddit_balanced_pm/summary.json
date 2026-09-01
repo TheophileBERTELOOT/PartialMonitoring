@@ -1,0 +1,101 @@
+{
+  "config": {
+    "data_dir": "/scratch/thber64/thber64/data/conversations/",
+    "output_dir": "outputs/reddit_balanced_pm",
+    "text_column": null,
+    "label_column": null,
+    "context_window": 6,
+    "no_recursive": false,
+    "train_fraction": 0.7,
+    "val_fraction": 0.15,
+    "eval_split": "test",
+    "algorithm": "linucb",
+    "bert_model": "/lustre06/project/6010878/thber64/ToxicityLimitationsProject/ToxicityLimitations/media/theophileberteloot/ad5f5ae6-6fd8-46ef-8659-a07d195c6d70/PhD/ToxicityLimitations/Models/bert-base-uncased-reddit",
+    "max_length": 256,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "human_cost": 0.2,
+    "false_positive_cost": 1.0,
+    "false_negative_cost": 25.0,
+    "class_weighting": "balanced",
+    "positive_weight": null,
+    "alpha": 2.0,
+    "neural_hidden_dim": 128,
+    "neural_dropout": 0.1,
+    "neural_epochs": 10,
+    "mc_samples": 20,
+    "seed": 13,
+    "device": "auto"
+  },
+  "dataset": {
+    "messages": 2082785,
+    "positive_messages": 38250,
+    "positive_rate": 0.018364833624209893,
+    "train_messages": 1463754,
+    "train_positive_messages": 26857,
+    "train_positive_rate": 0.01834802842554145,
+    "val_messages": 307507,
+    "test_messages": 311524,
+    "eval_messages": 311524,
+    "eval_positive_messages": 5549,
+    "eval_positive_rate": 0.017812431786957024,
+    "conversations": 523527,
+    "train_conversations": 366468,
+    "val_conversations": 78529,
+    "test_conversations": 78530,
+    "eval_conversations": 78530,
+    "files_found": 523529,
+    "files_read": 523527,
+    "files_with_messages": 523527,
+    "files_without_messages": 0,
+    "files_skipped_empty_header": 2,
+    "rows_seen": 2082791,
+    "messages_skipped_empty_text": 6
+  },
+  "systems": {
+    "message": {
+      "training": {
+        "train_examples": 1771261.0,
+        "train_positives": 32701.0,
+        "train_negatives": 1738560.0,
+        "train_positive_rate": 0.018461988380029822,
+        "mean_positive_weight": 27.082673312742727,
+        "mean_negative_weight": 0.5094046222160866
+      },
+      "test": {
+        "n": 311524,
+        "coverage": 0.01815911454655179,
+        "human_review_rate": 0.9818408854534482,
+        "acted_accuracy": 0.379883330387131,
+        "average_cost": 0.20801414979147137,
+        "cumulative_cost": 64801.39999963833,
+        "precision_remove": 0.08894668400520156,
+        "recall_remove": 0.9855907780979827,
+        "f1_remove": 0.16316793893129772,
+        "step": 311524
+      }
+    },
+    "context": {
+      "training": {
+        "train_examples": 1771261.0,
+        "train_positives": 32701.0,
+        "train_negatives": 1738560.0,
+        "train_positive_rate": 0.018461988380029822,
+        "mean_positive_weight": 27.082673312742727,
+        "mean_negative_weight": 0.5094046222160866
+      },
+      "test": {
+        "n": 311524,
+        "coverage": 0.021417290481632233,
+        "human_review_rate": 0.9785827095183678,
+        "acted_accuracy": 0.3220923261390887,
+        "average_cost": 0.21062069053952187,
+        "cumulative_cost": 65613.39999963401,
+        "precision_remove": 0.0909456740442656,
+        "recall_remove": 0.9890590809628009,
+        "f1_remove": 0.1665745347337387,
+        "step": 311524
+      }
+    }
+  }
+}

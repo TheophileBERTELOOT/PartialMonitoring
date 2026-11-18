@@ -1,3 +1,0 @@
-system,train_loss,val_loss,val_policy_accuracy,val_human_review_rate,n,coverage,human_review_rate,acted_accuracy,average_cost,cumulative_cost,precision_remove,recall_remove,f1_remove,step
-message,0.3247994929552078,0.3012572228908539,0.5,0.0,8,1.0,0.0,0.375,0.625,5.0,0.375,1.0,0.5454545454545454,8
-context,0.37318484485149384,0.3439979553222656,0.0,1.0,8,0.0,1.0,0.0,0.19999999999999998,1.5999999999999999,0.0,0.0,0.0,8

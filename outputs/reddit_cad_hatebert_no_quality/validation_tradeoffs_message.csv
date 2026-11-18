@@ -1,0 +1,2 @@
+min_pipeline_recall,keep_max,remove_min,n,coverage,human_review_rate,acted_accuracy,average_cost,cumulative_cost,precision_remove,recall_remove,f1_remove,selective_recall_remove,selective_f1_remove,global_auto_remove_recall,pipeline_recall_perfect_human,keep_error_rate,human_positive_rate,auto_keep,auto_remove,false_positives,false_negatives,positive_messages
+0.0,0.0543580097220475,2.0,2291,0.00043649061545176777,0.9995635093845482,1.0,0.19991270187690965,458.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.2126637554585153,1,0,0,0,487

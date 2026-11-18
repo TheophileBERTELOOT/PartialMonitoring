@@ -1,3 +1,0 @@
-system,train_loss,train_examples,n,coverage,human_review_rate,acted_accuracy,average_cost,cumulative_cost,precision_remove,recall_remove,f1_remove,step
-message,0.33938199281692505,12.0,8,1.0,0.0,0.375,0.625,5.0,0.375,1.0,0.5454545454545454,8
-context,0.29696744680404663,12.0,8,1.0,0.0,0.375,0.625,5.0,0.375,1.0,0.5454545454545454,8

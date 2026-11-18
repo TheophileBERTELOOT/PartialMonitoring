@@ -1,0 +1,197 @@
+{
+  "message": {
+    "roc_auc": 0.6749543926822621,
+    "average_precision": 0.04595833805401693,
+    "probability_mean": 0.01863747050297921,
+    "prevalence": 0.017812431786957024,
+    "probability_quantiles": {
+      "0": 0.0014402365141408,
+      "0.01": 0.00519389287053603,
+      "0.1": 0.00798216626672968,
+      "0.5": 0.014613724354128301,
+      "0.9": 0.03168835724660833,
+      "0.99": 0.07950172191322273,
+      "1": 0.7952154068265874
+    },
+    "brier": 0.017322092542333894,
+    "brier_constant_test_prevalence": 0.017495149060792026,
+    "brier_constant_train_prevalence": 0.0174954359245513,
+    "ece_deciles": 0.0008634641592802718,
+    "actions": {
+      "ask_human": 294390,
+      "keep": 17134
+    },
+    "stages": {
+      "calibration": {
+        "n": 152734,
+        "positives": 2850,
+        "prevalence": 0.01865989236188406,
+        "ap": 0.049262291700629984,
+        "probability_max": 0.8136928053638082
+      },
+      "tuning": {
+        "n": 154773,
+        "positives": 2994,
+        "prevalence": 0.019344459304917523,
+        "ap": 0.05753595818763832,
+        "probability_max": 0.7072511908932265
+      }
+    },
+    "position_groups": {
+      "first": {
+        "n": 78529,
+        "positives": 1564,
+        "auto_keep": 4137,
+        "fn": 34,
+        "coverage": 0.052681175107285205,
+        "pipeline_recall": 0.9782608695652174
+      },
+      "later": {
+        "n": 232995,
+        "positives": 3985,
+        "auto_keep": 12997,
+        "fn": 79,
+        "coverage": 0.055782312925170066,
+        "pipeline_recall": 0.9801756587202007
+      }
+    },
+    "top_probability_groups": {
+      "100": {
+        "precision": 0.16,
+        "probability_mean": 0.4092292558015664
+      },
+      "1000": {
+        "precision": 0.14,
+        "probability_mean": 0.2039323688116151
+      },
+      "10000": {
+        "precision": 0.0755,
+        "probability_mean": 0.08265976872718357
+      }
+    }
+  },
+  "context": {
+    "roc_auc": 0.6929279944075327,
+    "average_precision": 0.05053198690804059,
+    "probability_mean": 0.018638463276651144,
+    "prevalence": 0.017812431786957024,
+    "probability_quantiles": {
+      "0": 0.0007943914712898,
+      "0.01": 0.005076953743658779,
+      "0.1": 0.00789913822134622,
+      "0.5": 0.014264205606105449,
+      "0.9": 0.031443286085817646,
+      "0.99": 0.08672438772565097,
+      "1": 0.7873262144861921
+    },
+    "brier": 0.017286287753151525,
+    "brier_constant_test_prevalence": 0.017495149060792026,
+    "brier_constant_train_prevalence": 0.0174954359245513,
+    "ece_deciles": 0.0012127840564047664,
+    "actions": {
+      "ask_human": 290352,
+      "keep": 21172
+    },
+    "stages": {
+      "calibration": {
+        "n": 152734,
+        "positives": 2850,
+        "prevalence": 0.01865989236188406,
+        "ap": 0.05325551628982912,
+        "probability_max": 0.8549829585716512
+      },
+      "tuning": {
+        "n": 154773,
+        "positives": 2994,
+        "prevalence": 0.019344459304917523,
+        "ap": 0.06348728589959368,
+        "probability_max": 0.9360055741136236
+      }
+    },
+    "position_groups": {
+      "first": {
+        "n": 78529,
+        "positives": 1564,
+        "auto_keep": 6955,
+        "fn": 63,
+        "coverage": 0.08856600746221141,
+        "pipeline_recall": 0.9597186700767264
+      },
+      "later": {
+        "n": 232995,
+        "positives": 3985,
+        "auto_keep": 14217,
+        "fn": 77,
+        "coverage": 0.061018476791347455,
+        "pipeline_recall": 0.9806775407779171
+      }
+    },
+    "top_probability_groups": {
+      "100": {
+        "precision": 0.21,
+        "probability_mean": 0.4582774248505022
+      },
+      "1000": {
+        "precision": 0.149,
+        "probability_mean": 0.2309352833109719
+      },
+      "10000": {
+        "precision": 0.0819,
+        "probability_mean": 0.08985454026623803
+      }
+    }
+  },
+  "paired_actions": {
+    "both_keep": {
+      "n": 7764,
+      "positives": 45
+    },
+    "message_only_keep": {
+      "n": 9370,
+      "positives": 68
+    },
+    "context_only_keep": {
+      "n": 13408,
+      "positives": 95
+    },
+    "both_human": {
+      "n": 280982,
+      "positives": 5341
+    }
+  },
+  "conversation_bootstrap": {
+    "replicates": 2000,
+    "seed": 13,
+    "conversations": 78530,
+    "percentile_95_ci": {
+      "message_recall": {
+        "lower": 0.9756998877383776,
+        "upper": 0.9833091501984315
+      },
+      "context_recall": {
+        "lower": 0.9700402692642836,
+        "upper": 0.9792128775141569
+      },
+      "message_cost_saving": {
+        "lower": 0.0006671775596511165,
+        "upper": 0.018220713052013587
+      },
+      "context_cost_saving": {
+        "lower": 0.0009543300685984857,
+        "upper": 0.02140276157617106
+      },
+      "context_minus_message_cost_per_message": {
+        "lower": -0.0024753503773777587,
+        "upper": 0.0017254573283491804
+      },
+      "context_minus_message_coverage": {
+        "lower": 0.011815954280760056,
+        "upper": 0.014096182944093776
+      },
+      "context_minus_message_recall": {
+        "lower": -0.009661737136677973,
+        "upper": -0.00018212297358009605
+      }
+    }
+  }
+}

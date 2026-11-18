@@ -48,7 +48,7 @@ class ModerationDataset(Dataset):
 def build_text_with_context(text: str, context: tuple[str, ...], use_context: bool) -> str:
     if not use_context or not context:
         return text
-    return " [CTX] ".join(context) + " [CURRENT] " + text
+    return text + " [CTX] " + " [CTX] ".join(reversed(context))
 
 
 def collate_batch(batch: list[EncodedExample]) -> dict[str, object]:
@@ -74,16 +74,17 @@ def collate_batch(batch: list[EncodedExample]) -> dict[str, object]:
 class BertCollator:
     def __init__(self, tokenizer, max_length: int = 256) -> None:
         self.tokenizer = tokenizer
+        self.tokenizer.truncation_side = "right"
         self.max_length = max_length
 
     def __call__(self, batch: list[EncodedExample]) -> dict[str, object]:
         base = collate_batch(batch)
+        if self.max_length <= self.tokenizer.num_special_tokens_to_add(pair=False):
+            raise ValueError("max_length must leave room for at least one message token")
+        # Current message comes first; right truncation discards older context first.
         encoded = self.tokenizer(
-            base["texts"],
-            padding=True,
-            truncation=True,
-            max_length=self.max_length,
-            return_tensors="pt",
+            base["texts"], padding=True, truncation=True,
+            max_length=self.max_length, return_tensors="pt",
         )
         base.update(encoded)
         return base

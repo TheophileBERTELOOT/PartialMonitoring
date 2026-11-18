@@ -14,12 +14,16 @@ class RunningMetrics:
     fp: int = 0
     tn: int = 0
     fn: int = 0
+    positives: int = 0
+    human_positives: int = 0
 
     def update(self, action: str, prediction: int | None, label: int, cost: float) -> dict[str, float]:
         self.total += 1
         self.cumulative_cost += cost
+        self.positives += label
         if action == "ask_human":
             self.human_reviews += 1
+            self.human_positives += label
         else:
             self.acted += 1
             self.correct_actions += int(prediction == label)
@@ -47,4 +51,15 @@ class RunningMetrics:
             "precision_remove": precision,
             "recall_remove": recall,
             "f1_remove": f1,
+            "selective_recall_remove": recall,
+            "selective_f1_remove": f1,
+            "global_auto_remove_recall": self.tp / max(1, self.positives),
+            "pipeline_recall_perfect_human": (self.tp + self.human_positives) / max(1, self.positives),
+            "keep_error_rate": self.fn / max(1, self.tn + self.fn),
+            "human_positive_rate": self.human_positives / max(1, self.human_reviews),
+            "auto_keep": self.tn + self.fn,
+            "auto_remove": self.tp + self.fp,
+            "false_positives": self.fp,
+            "false_negatives": self.fn,
+            "positive_messages": self.positives,
         }

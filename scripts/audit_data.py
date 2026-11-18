@@ -6,6 +6,7 @@ import csv
 import json
 import sys
 from collections import Counter
+from dataclasses import asdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,12 +14,16 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from partial_monitoring.data import LABEL_COLUMN_CANDIDATES, TEXT_COLUMN_CANDIDATES, find_column, parse_label
+from partial_monitoring.data import (
+    CAD_LABEL_MAPPING, LABEL_COLUMN_CANDIDATES, TEXT_COLUMN_CANDIDATES,
+    find_column, load_conversations_with_stats, parse_label, resolve_data_format,
+)
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Audit conversation CSV files without training a model.")
-    parser.add_argument("--data-dir", required=True)
+    parser = argparse.ArgumentParser(description="Audit conversation CSVs or a CAD TSV without training a model.")
+    parser.add_argument("--data-dir", "--data-path", dest="data_dir", required=True)
+    parser.add_argument("--data-format", choices=("auto", "csv", "cad"), default="auto")
     parser.add_argument("--text-column", default=None)
     parser.add_argument("--label-column", default=None)
     parser.add_argument("--no-recursive", action="store_true")
@@ -34,7 +39,31 @@ def add_example(items: list[str], value: str, limit: int) -> None:
 def main() -> None:
     args = parse_args()
     root = Path(args.data_dir)
-    paths = root.rglob("*") if not args.no_recursive else root.glob("*")
+    if not root.exists():
+        raise FileNotFoundError(f"Data path does not exist: {root}")
+    if resolve_data_format(root, args.data_format) == "cad":
+        examples, load_stats = load_conversations_with_stats(
+            root, text_column=args.text_column, label_column=args.label_column,
+            context_window=0, data_format="cad",
+        )
+        split_stats = {}
+        for split in ("train", "val", "test"):
+            partition = [example for example in examples if example.split == split]
+            positives = sum(example.label for example in partition)
+            split_stats[split] = {
+                "messages": len(partition), "positive_messages": positives,
+                "positive_rate": positives / max(1, len(partition)),
+                "conversations": len({example.conversation_id for example in partition}),
+            }
+        stats = {
+            "data_dir": str(root), **asdict(load_stats),
+            "loaded_messages": len(examples), "positive_messages": sum(e.label for e in examples),
+            "conversations": len({e.conversation_id for e in examples}),
+            "label_mapping": CAD_LABEL_MAPPING, "splits": split_stats,
+        }
+        print(json.dumps(stats, indent=2))
+        return
+    paths = [root] if root.is_file() else (root.rglob("*") if not args.no_recursive else root.glob("*"))
 
     total_files = 0
     suffix_counts: Counter[str] = Counter()

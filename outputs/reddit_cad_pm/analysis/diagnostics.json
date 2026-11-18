@@ -1,0 +1,194 @@
+{
+  "message": {
+    "stages": {
+      "test": {
+        "n": 5307,
+        "conversations": 342,
+        "positives": 906,
+        "prevalence": 0.17071791972866027,
+        "average_precision": 0.44046343081371,
+        "roc_auc": 0.7723964501345018,
+        "mean_probability": 0.1474071373703428,
+        "brier": 0.1197893790419637,
+        "probability_quantiles": {
+          "0": 0.0275014461453601,
+          "0.01": 0.033440325126936114,
+          "0.1": 0.03881611401459538,
+          "0.5": 0.0864948013142855,
+          "0.9": 0.3495789879702523,
+          "0.99": 0.6777963320083669,
+          "1": 0.9174924559967804
+        },
+        "below_bayes_keep_threshold": 0,
+        "above_half": 196,
+        "above_bayes_remove_threshold": 12,
+        "top100_precision": 0.72
+      },
+      "calibration": {
+        "n": 2234,
+        "conversations": 152,
+        "positives": 313,
+        "prevalence": 0.14010743061772604,
+        "average_precision": 0.41250925394936155,
+        "roc_auc": 0.7881977071978952,
+        "mean_probability": 0.1401964286414508,
+        "brier": 0.10150582925841763,
+        "probability_quantiles": {
+          "0": 0.0300167637044321,
+          "0.01": 0.033137391061378835,
+          "0.1": 0.03806767443615892,
+          "0.5": 0.07803805411472,
+          "0.9": 0.34177450290832984,
+          "0.99": 0.6569460115099033,
+          "1": 0.9664290108631072
+        },
+        "below_bayes_keep_threshold": 0,
+        "above_half": 79,
+        "above_bayes_remove_threshold": 4,
+        "top100_precision": 0.55
+      },
+      "tuning": {
+        "n": 2291,
+        "conversations": 152,
+        "positives": 487,
+        "prevalence": 0.2125709297250109,
+        "average_precision": 0.5524275736030613,
+        "roc_auc": 0.795818782809818,
+        "mean_probability": 0.1639189724830391,
+        "brier": 0.13414378693676005,
+        "probability_quantiles": {
+          "0": 0.0290944856306828,
+          "0.01": 0.03310401863445141,
+          "0.1": 0.0392363084345684,
+          "0.5": 0.0961991981298212,
+          "0.9": 0.4023689255186677,
+          "0.99": 0.7248964192167576,
+          "1": 0.9121265068035272
+        },
+        "below_bayes_keep_threshold": 0,
+        "above_half": 118,
+        "above_bayes_remove_threshold": 10,
+        "top100_precision": 0.75,
+        "best_prefix_precision_min20": 0.9230769230769231,
+        "best_prefix_precision_min50": 0.7843137254901961,
+        "best_prefix_precision_min100": 0.7542372881355932,
+        "largest_economically_eligible_keep_group": 28,
+        "first_positive_in_ascending_scores": 29
+      }
+    },
+    "test_cost_minus_all_human_bootstrap_conversation_95ci": [
+      -0.0021857056538835675,
+      0.013863633983868327
+    ],
+    "by_position_test": {
+      "later": {
+        "n": 4965,
+        "ap": 0.45054404731336994,
+        "prevalence": 0.17220543806646527,
+        "auto_keep": 43
+      },
+      "first": {
+        "n": 342,
+        "ap": 0.3140014144712235,
+        "prevalence": 0.14912280701754385,
+        "auto_keep": 4
+      }
+    }
+  },
+  "context": {
+    "stages": {
+      "test": {
+        "n": 5307,
+        "conversations": 342,
+        "positives": 906,
+        "prevalence": 0.17071791972866027,
+        "average_precision": 0.33085956158289687,
+        "roc_auc": 0.6988921843470253,
+        "mean_probability": 0.15347911032416978,
+        "brier": 0.13099043936403068,
+        "probability_quantiles": {
+          "0": 0.0295856240463588,
+          "0.01": 0.03726600870851138,
+          "0.1": 0.0559620109405348,
+          "0.5": 0.1277365948984875,
+          "0.9": 0.28401264111697183,
+          "0.99": 0.4751062390790342,
+          "1": 0.7633555516223882
+        },
+        "below_bayes_keep_threshold": 0,
+        "above_half": 40,
+        "above_bayes_remove_threshold": 0,
+        "top100_precision": 0.55
+      },
+      "calibration": {
+        "n": 2234,
+        "conversations": 152,
+        "positives": 313,
+        "prevalence": 0.14010743061772604,
+        "average_precision": 0.29428033405605813,
+        "roc_auc": 0.7033344254606477,
+        "mean_probability": 0.14003435012257676,
+        "brier": 0.11175985696219684,
+        "probability_quantiles": {
+          "0": 0.0325535797997004,
+          "0.01": 0.03637022259274884,
+          "0.1": 0.05329325258082776,
+          "0.5": 0.11484722130728076,
+          "0.9": 0.2607549031566605,
+          "0.99": 0.49007806814749266,
+          "1": 0.7530323148594155
+        },
+        "below_bayes_keep_threshold": 0,
+        "above_half": 20,
+        "above_bayes_remove_threshold": 0,
+        "top100_precision": 0.42
+      },
+      "tuning": {
+        "n": 2291,
+        "conversations": 152,
+        "positives": 487,
+        "prevalence": 0.2125709297250109,
+        "average_precision": 0.3582543825137624,
+        "roc_auc": 0.671538720707349,
+        "mean_probability": 0.16828148503941992,
+        "brier": 0.15834534917386883,
+        "probability_quantiles": {
+          "0": 0.0334935557983279,
+          "0.01": 0.03710533369973454,
+          "0.1": 0.0576771833658668,
+          "0.5": 0.1434721817626064,
+          "0.9": 0.3125401610784493,
+          "0.99": 0.49807975228346096,
+          "1": 0.7640966046552842
+        },
+        "below_bayes_keep_threshold": 0,
+        "above_half": 21,
+        "above_bayes_remove_threshold": 0,
+        "top100_precision": 0.53,
+        "best_prefix_precision_min20": 0.65,
+        "best_prefix_precision_min50": null,
+        "best_prefix_precision_min100": null,
+        "largest_economically_eligible_keep_group": 3,
+        "first_positive_in_ascending_scores": 4
+      }
+    },
+    "test_cost_minus_all_human_bootstrap_conversation_95ci": [
+      -0.0006502814166432419,
+      0.01485528642914457
+    ],
+    "by_position_test": {
+      "later": {
+        "n": 4965,
+        "ap": 0.3319335575830268,
+        "prevalence": 0.17220543806646527,
+        "auto_keep": 0
+      },
+      "first": {
+        "n": 342,
+        "ap": 0.32976862714385147,
+        "prevalence": 0.14912280701754385,
+        "auto_keep": 13
+      }
+    }
+  }
+}

@@ -28,6 +28,29 @@ def get_device(device_name: str) -> torch.device:
     return torch.device(device_name)
 
 
+def _validate_encoder_input_ids(input_ids: torch.Tensor, model: nn.Module, tokenizer) -> None:
+    """Check indices on CPU before an invalid embedding lookup poisons CUDA."""
+    embedding_count = model.get_input_embeddings().num_embeddings
+    smallest, largest = int(input_ids.min()), int(input_ids.max())
+    if smallest < 0 or largest >= embedding_count:
+        raise ValueError(
+            f"Tokenizer/model vocabulary mismatch: input_ids range [{smallest}, {largest}], "
+            f"but the model accepts IDs 0..{embedding_count - 1}. "
+            f"Tokenizer: {getattr(tokenizer, 'name_or_path', '<unknown>')!r}. "
+            "Copy the weights and matching tokenizer from the same checkpoint into --bert-model; "
+            "do not add vocabulary entries without compatible model embeddings."
+        )
+    # BERT uses a fixed position embedding table. Other architectures may use
+    # relative positions or position offsets, so do not infer their limits here.
+    if getattr(model.config, "model_type", None) == "bert":
+        position_count = model.embeddings.position_embeddings.num_embeddings
+        if input_ids.shape[1] > position_count:
+            raise ValueError(
+                f"Encoded sequence has {input_ids.shape[1]} tokens, but this BERT model supports "
+                f"at most {position_count}. Set --max-length to {position_count} or less."
+            )
+
+
 @torch.no_grad()
 def extract_bert_features(
     dataset: ModerationDataset,
@@ -50,6 +73,7 @@ def extract_bert_features_with_model(
     batch_size: int,
     max_length: int,
     device: torch.device,
+    pooling: str = "mean",
 ) -> tuple[np.ndarray, np.ndarray, list[dict[str, object]]]:
     model.eval()
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, collate_fn=BertCollator(tokenizer, max_length))
@@ -58,13 +82,18 @@ def extract_bert_features_with_model(
     labels: list[np.ndarray] = []
     metadata: list[dict[str, object]] = []
     for batch in tqdm(loader, desc="BERT embeddings", leave=False):
+        _validate_encoder_input_ids(batch["input_ids"], model, tokenizer)
         input_ids = batch["input_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
         kwargs = {"input_ids": input_ids, "attention_mask": attention_mask}
-        if "token_type_ids" in batch:
-            kwargs["token_type_ids"] = batch["token_type_ids"].to(device)
+        # The collator encodes one string per example, including any context.
+        # Let BERT use segment zero throughout rather than forwarding segment
+        # IDs from a potentially malformed local tokenizer postprocessor.
         outputs = model(**kwargs)
-        if getattr(outputs, "pooler_output", None) is not None:
+        if pooling == "mean":
+            mask = attention_mask.unsqueeze(-1).to(outputs.last_hidden_state.dtype)
+            pooled = (outputs.last_hidden_state * mask).sum(dim=1) / mask.sum(dim=1).clamp(min=1)
+        elif getattr(outputs, "pooler_output", None) is not None:
             pooled = outputs.pooler_output
         else:
             pooled = outputs.last_hidden_state[:, 0]
@@ -81,6 +110,11 @@ class LinUCB:
         self.alpha = alpha
         self.a = np.stack([np.eye(feature_dim, dtype=np.float64) * ridge for _ in ACTION_NAMES])
         self.b = np.zeros((len(ACTION_NAMES), feature_dim), dtype=np.float64)
+        self._inv_a = None
+        self._theta = None
+        self.reward_noise = np.ones(len(ACTION_NAMES))
+        self.margin_noise = 1.0
+        self.human_cost = 0.2
 
     def fit(
         self,
@@ -93,8 +127,30 @@ class LinUCB:
         positive_weight: float | None = None,
     ) -> dict[str, float]:
         weights = sample_weights(labels, class_weighting, positive_weight)
-        for x, label, weight in zip(features, labels, weights):
-            self.update_full_feedback(x, int(label), human_cost, false_positive_cost, false_negative_cost, float(weight))
+        self.human_cost = human_cost
+        rewards = np.asarray([
+            action_rewards(int(y), human_cost, false_positive_cost, false_negative_cost) for y in labels
+        ])
+        # Full feedback shares one Gram matrix across actions; use batched BLAS.
+        for start in range(0, len(features), 4096):
+            x = features[start:start + 4096].astype(np.float64)
+            w = weights[start:start + 4096]
+            gram = x.T @ (w[:, None] * x)
+            self.a += gram[None, :, :]
+            self.b += (x.T @ (w[:, None] * rewards[start:start + 4096])).T
+        self._inv_a = None
+        self._theta = None
+        self._parameters()
+        residual_sums = np.zeros(len(ACTION_NAMES))
+        margin_residual_sum = 0.0
+        for start in range(0, len(features), 4096):
+            residual = rewards[start:start + 4096] - features[start:start + 4096] @ self._theta.T
+            w = weights[start:start + 4096]
+            residual_sums += (w[:, None] * residual ** 2).sum(axis=0)
+            margin_residual_sum += float((w * (residual[:, 1] - residual[:, 0]) ** 2).sum())
+        self.reward_noise = np.sqrt(residual_sums / weights.sum())
+        self.reward_noise[2] = 0.0
+        self.margin_noise = float(np.sqrt(margin_residual_sum / weights.sum()))
         return training_stats(labels, weights)
 
     def update_full_feedback(
@@ -107,21 +163,39 @@ class LinUCB:
         sample_weight: float,
     ) -> None:
         rewards = action_rewards(label, human_cost, false_positive_cost, false_negative_cost)
+        self.human_cost = human_cost
         outer = np.outer(x, x)
         for action_index, reward in enumerate(rewards):
             self.a[action_index] += sample_weight * outer
             self.b[action_index] += sample_weight * reward * x
+        if self._inv_a is not None:
+            projected = self._inv_a @ x
+            self._inv_a -= sample_weight * np.outer(projected, projected) / (1 + sample_weight * x @ projected)
+            self._theta = self.b @ self._inv_a
+        else:
+            self._theta = None
+
+    def _parameters(self) -> None:
+        if self._theta is None:
+            self._inv_a = np.linalg.inv(self.a[0])
+            self._theta = np.linalg.solve(self.a[0], self.b.T).T
+
+    def predict_removal_scores(self, features: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        self._parameters()
+        scores = features @ (self._theta[1] - self._theta[0])
+        std = np.empty(len(features))
+        for start in range(0, len(features), 4096):
+            x = features[start:start + 4096]
+            std[start:start + 4096] = np.sqrt(np.maximum(0, np.einsum("ij,ij->i", x @ self._inv_a, x))) * self.margin_noise
+        return scores, std
 
     def decide(self, x: np.ndarray) -> BanditDecision:
-        scores: list[float] = []
-        uncertainty: list[float] = []
-        for action_index in range(len(ACTION_NAMES)):
-            inv_a = np.linalg.inv(self.a[action_index])
-            theta = inv_a @ self.b[action_index]
-            width = float(np.sqrt(max(0.0, x @ inv_a @ x)))
-            mean = float(x @ theta)
-            scores.append(mean + self.alpha * width)
-            uncertainty.append(width)
+        self._parameters()
+        width = float(np.sqrt(max(0.0, x @ self._inv_a @ x)))
+        uncertainty = (width * self.reward_noise).tolist()
+        means = self._theta @ x
+        means[2] = -self.human_cost
+        scores = (means - self.alpha * np.asarray(uncertainty)).tolist()
         action_index = int(np.argmax(scores))
         return BanditDecision(INDEX_TO_ACTION[action_index], action_index, scores, uncertainty)
 
@@ -146,6 +220,7 @@ class NeuralUCB:
         self.mc_samples = mc_samples
         self.device = get_device(device_name)
         self.model = NeuralRewardModel(feature_dim, hidden_dim, dropout).to(self.device)
+        self.human_cost = 0.2
 
     def fit(
         self,
@@ -158,6 +233,7 @@ class NeuralUCB:
         positive_weight: float | None = None,
     ) -> dict[str, float]:
         weights = sample_weights(labels, class_weighting, positive_weight)
+        self.human_cost = human_cost
         x = torch.tensor(features, dtype=torch.float32)
         y = torch.tensor(
             [action_rewards(int(label), human_cost, false_positive_cost, false_negative_cost) for label in labels],
@@ -196,7 +272,9 @@ class NeuralUCB:
         stacked = np.stack(samples)
         means = stacked.mean(axis=0)
         uncertainty = stacked.std(axis=0)
-        scores = means + self.alpha * uncertainty
+        means[2] = -self.human_cost
+        uncertainty[2] = 0.0
+        scores = means - self.alpha * uncertainty
         action_index = int(np.argmax(scores))
         return BanditDecision(
             INDEX_TO_ACTION[action_index],
@@ -204,6 +282,18 @@ class NeuralUCB:
             scores.astype(float).tolist(),
             uncertainty.astype(float).tolist(),
         )
+
+    @torch.no_grad()
+    def predict_removal_scores(self, features: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        scores, std = [], []
+        self.model.train()
+        for start in range(0, len(features), self.batch_size):
+            x = torch.as_tensor(features[start:start + self.batch_size], dtype=torch.float32, device=self.device)
+            samples = torch.stack([self.model(x) for _ in range(self.mc_samples)])
+            margins = samples[:, :, 1] - samples[:, :, 0]
+            scores.append(margins.mean(dim=0).cpu().numpy())
+            std.append(margins.std(dim=0, unbiased=False).cpu().numpy())
+        return np.concatenate(scores), np.concatenate(std)
 
 
 def sample_weights(labels: np.ndarray, class_weighting: str = "balanced", positive_weight: float | None = None) -> np.ndarray:
